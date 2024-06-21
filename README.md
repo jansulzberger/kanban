@@ -7,7 +7,7 @@ setup the container with the following command
 ```
 destroy the container with the following command
 ```bash
-./destroy.sh
+./reset.sh
 ```
 run the container with the following command
 ```bash
