@@ -1,0 +1,14 @@
+services:
+  git:
+    build:
+      context: .
+      dockerfile: docker/git.Dockerfile
+    volumes:
+      - ./kanban_git:/opt/kanban_git
+    networks:
+      - kanban
+    entrypoint: ["/usr/bin/git"]
+    tty: true
+networks:
+    kanban:
+        driver: bridge
