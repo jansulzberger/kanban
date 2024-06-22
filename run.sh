@@ -1,2 +1,8 @@
 #!/usr/bin/env zsh
-echo "run.sh"
+
+docker compose down --remove-orphans
+docker compose build
+docker compose --env-file .env.local up -d server
+docker ps
+
+echo "Success!"

@@ -1,4 +1,45 @@
 services:
+  server:
+    build:
+      context: .
+      dockerfile: apache/Dockerfile
+    volumes:
+      - ./src:/var/www/html
+      - ./apache/ssl:/etc/apache2/ssl
+      - ./apache/config/default-ssl.conf:/etc/apache2/sites-available/default-ssl.conf
+    ports:
+      - '${HTTP_PORT}:80'
+      - '${HTTPS_PORT}:443'
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - kanban
+  db:
+    image: mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${DB_DATABASE}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - '${DB_PORT}:3306'
+    healthcheck:
+      test: "exit 0"
+    volumes:
+      - db:/var/lib/mysql
+      - ./initdb:/docker-entrypoint-initdb.d
+    networks:
+      - kanban
+  php:
+    build:
+      context: .
+      dockerfile: dockerfiles/php.Dockerfile
+    volumes:
+      - ./src:/var/www/html:delegated
+    networks:
+      - kanban
   git:
     build:
       context: .
@@ -9,6 +50,17 @@ services:
       - kanban
     entrypoint: ["/usr/bin/git"]
     tty: true
+  composer:
+      build:
+          context: .
+          dockerfile: docker/composer.Dockerfile
+      volumes:
+          - ./src:/var/www/html
+      networks:
+          - kanban
+volumes:
+    db:
+        driver: local
 networks:
     kanban:
         driver: bridge

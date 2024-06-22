@@ -1,3 +1,4 @@
 .idea
 nginx/ssl
 kanban_git
+/src/vendor
